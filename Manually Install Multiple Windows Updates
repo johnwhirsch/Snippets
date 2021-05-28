@@ -1,0 +1,25 @@
+# Create a text file in the same folder that this script is saved in and copy the download URLs you wish to install from the Microsoft Update Catalog
+# Add one update per line, as many lines as you would like
+# https://www.catalog.update.microsoft.com/Home.aspx
+
+$updates = Get-Content "$($PSScriptRoot)\manual-updates.txt"
+
+New-Item -ItemType Directory -Path "C:\ManualUpdates"
+
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+foreach($update in $updates){
+
+    $name = ($update -split "/")[-1]
+
+    Write-Output "Downloading $name"
+    try{ Invoke-WebRequest -Uri "$update" -OutFile "C:\ManualUpdates\$($name)" }
+    catch { Write-Output "Error downloading $name"; }
+
+    Write-Output "Installing $name"
+    try{ Start-Process -FilePath "wusa.exe" -ArgumentList "C:\ManualUpdates\$($name) /quiet /norestart" -Wait }
+    catch{ Write-Output "Error installing $name"; }
+
+}
+
+Remove-Item -Path "C:\ManualUpdates" -Force -Confirm:$false
