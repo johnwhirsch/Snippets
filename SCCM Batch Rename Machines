@@ -1,0 +1,20 @@
+$computers = import-csv -Path ".\ComputerBadNames.csv"
+$NetworkTest = "DC01.domain.com"
+
+if(test-connection $NetworkTest -ErrorAction SilentlyContinue){
+
+    foreach ($computer in $computers){
+        $found = $false;
+        if($env:COMPUTERNAME -eq $($computer.Original)){
+            $computerObject = Get-WmiObject -Class Win32_ComputerSystem
+            $computerObject.rename($computer.Replacement) | Out-Null
+            Write-Output "Computer renamed successfully"; $found = $true;
+        }
+        if($env:COMPUTERNAME -eq $($computer.Replacement)){ Write-Output "Computer already renamed"; $found = $true; }
+
+        if($found){ exit 0; }
+    }
+
+    Write-Output "Machine name not found in 'ComputerBadNames.csv'"; exit 665; ;
+
+}else{ Write-Output "Machine is not on domain network"; exit 666; }
