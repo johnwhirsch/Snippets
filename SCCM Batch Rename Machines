@@ -1,4 +1,8 @@
-$computers = import-csv -Path ".\ComputerBadNames.csv"
+# In the same folder this script is saved to create a CSV file named ComputerBadNames.csv
+# Create two columns, one named Original for the names you are searching for to change
+# and one column named Replacement, with the new computer name
+
+$computers = import-csv -Path "$($PSScriptRoot)\ComputerBadNames.csv"
 $NetworkTest = "DC01.domain.com"
 
 if(test-connection $NetworkTest -ErrorAction SilentlyContinue){
