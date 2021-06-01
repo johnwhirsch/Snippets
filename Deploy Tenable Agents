@@ -1,0 +1,18 @@
+$group = $((Get-WmiObject win32_computersystem).Domain)
+
+#Uncomment and edit the line below to manually override the group selection
+#$group = "domain.local"
+
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+try{ Invoke-WebRequest -Uri "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/12741/download?i_agree_to_tenable_license_agreement=true" -OutFile "$($env:APPDATA)\nessus.msi"}
+catch{ Write-Error "Unable to download Nessus Agent from Tenable's site`n$error"; exit 660; }
+
+if(Test-Path "$($env:APPDATA)\nessus.msi"){
+     
+    try{ Start-Process "msiexec.exe" -ArgumentList "/i `"$($env:APPDATA)\nessus.msi`" NESSUS_SERVER=`"sensor.cloud.tenable.com:443`" NESSUS_GROUPS=`"$($group)`" NESSUS_KEY=0b6e2c91bfbbfffe680bd2e2888fe6be986820049963a6c6a6d32b39aaecd2c6 /qn" -Wait }
+    catch{ Write-Error "Unable to install Nessus Agent`n$error"; exit 664; }
+}
+ 
+if((Get-Service -Name 'Tenable Nessus Agent').Status -eq "Running"){ Write-Output "Install Succeeeded"; exit 0; }
+else{ Write-Error "Install failed`n$error"; Exit 666; }
