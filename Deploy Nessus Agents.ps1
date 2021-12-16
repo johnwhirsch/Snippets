@@ -6,7 +6,7 @@ $Nessus_Key = "YOUR_NESSUS_KEY_HERE"
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-try{ Invoke-WebRequest -Uri "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/12741/download?i_agree_to_tenable_license_agreement=true" -OutFile "$($env:APPDATA)\nessus.msi"}
+try{ Invoke-WebRequest -Uri "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/15492/download?i_agree_to_tenable_license_agreement=true" -OutFile "$($env:APPDATA)\nessus.msi"}
 catch{ Write-Error "Unable to download Nessus Agent from Tenable's site`n$error"; exit 660; }
 
 if(Test-Path "$($env:APPDATA)\nessus.msi"){
